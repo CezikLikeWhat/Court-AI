@@ -12,3 +12,11 @@ class AiProvider(str, Enum):
             AiProvider.OPEN_AI.value,
             AiProvider.ANTHROPIC.value
         ]
+
+    @staticmethod
+    def get_by_name(name: str) -> 'AiProvider':
+        match name:
+            case 'OpenAI':
+                return AiProvider.OPEN_AI
+            case 'Anthropic':
+                return AiProvider.ANTHROPIC
