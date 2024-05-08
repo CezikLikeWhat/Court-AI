@@ -1,21 +1,22 @@
 from enum import Enum
+from typing import List
 
 
 class CourtCaseType(str, Enum):
     CIVIL = 'Civil'
     CRIMINAL = 'Criminal'
 
-    @staticmethod
-    def get_all():
-        return [
-            CourtCaseType.CIVIL.value,
-            CourtCaseType.CRIMINAL.value
-        ]
+    @classmethod
+    def get_all(cls) -> List[str]:
+        return [member.value for member in cls]
 
-    @staticmethod
-    def get_by_name(name: str) -> 'CourtCaseType':
-        match name:
-            case 'Civil':
-                return CourtCaseType.CIVIL
-            case 'Criminal':
-                return CourtCaseType.CRIMINAL
+    @classmethod
+    def get_by_name(cls, name: str) -> 'CourtCaseType':
+        return cls[name.upper()]
+
+    @classmethod
+    def index_of(cls, name: str) -> int:
+        try:
+            return cls.get_all().index(cls.get_by_name(name).value)
+        except (KeyError, ValueError):
+            return 0

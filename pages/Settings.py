@@ -58,6 +58,76 @@ class Settings:
 
         return True
 
+    def supervisor_view(self):
+        st.subheader('Supervisor :brain:')
+        self.supervisor_provider = st.selectbox('Supervisor provider',
+                                                AiProvider.get_all(),
+                                                AiProvider.index_of(
+                                                    st.session_state.supervisor_provider) if 'supervisor_provider' in st.session_state else 0
+                                                )
+        self.supervisor_model = st.selectbox('Supervisor model',
+                                             AiModel.get_all_by_provider(self.supervisor_provider),
+                                             AiModel.index_of(
+                                                 st.session_state.supervisor_model,
+                                                 self.supervisor_provider) if 'supervisor_model' in st.session_state else 0
+                                             )
+
+    def judge_view(self):
+        st.subheader('Judge :judge:')
+        self.judge_provider = st.selectbox('Judge provider',
+                                           AiProvider.get_all(),
+                                           AiProvider.index_of(
+                                               st.session_state.judge_provider) if 'judge_provider' in st.session_state else 0
+                                           )
+        self.judge_model = st.selectbox('Judge model',
+                                        AiModel.get_all_by_provider(self.judge_provider),
+                                        AiModel.index_of(
+                                            st.session_state.judge_model,
+                                            self.judge_provider) if 'judge_model' in st.session_state else 0
+                                        )
+
+    def witness_view(self):
+        st.subheader('Witness :adult:')
+        self.witness_provider = st.selectbox('Witness provider',
+                                             AiProvider.get_all(),
+                                             AiProvider.index_of(
+                                                 st.session_state.witness_provider) if 'witness_provider' in st.session_state else 0
+                                             )
+        self.witness_model = st.selectbox('Witness model',
+                                          AiModel.get_all_by_provider(self.witness_provider),
+                                          AiModel.index_of(
+                                              st.session_state.witness_model,
+                                              self.witness_provider) if 'witness_model' in st.session_state else 0
+                                          )
+
+    def defense_view(self):
+        st.subheader('Defense :shield:')
+        self.defense_provider = st.selectbox('Defense provider',
+                                             AiProvider.get_all(),
+                                             AiProvider.index_of(
+                                                 st.session_state.defense_provider) if 'defense_provider' in st.session_state else 0
+                                             )
+        self.defense_model = st.selectbox('Defense model',
+                                          AiModel.get_all_by_provider(self.defense_provider),
+                                          AiModel.index_of(
+                                              st.session_state.defense_model,
+                                              self.defense_provider) if 'defense_model' in st.session_state else 0
+                                          )
+
+    def prosecutor_view(self):
+        st.subheader('Prosecutor :crossed_swords:')
+        self.prosecutor_provider = st.selectbox('Prosecutor provider',
+                                                AiProvider.get_all(),
+                                                AiProvider.index_of(
+                                                    st.session_state.prosecutor_provider) if 'prosecutor_provider' in st.session_state else 0
+                                                )
+        self.prosecutor_model = st.selectbox('Prosecutor model',
+                                             AiModel.get_all_by_provider(self.prosecutor_provider),
+                                             AiModel.index_of(
+                                                 st.session_state.prosecutor_model,
+                                                 self.prosecutor_provider) if 'prosecutor_model' in st.session_state else 0
+                                             )
+
     def view(self) -> None:
         main_container = st.container(border=True)
 
@@ -67,93 +137,71 @@ class Settings:
         with main_container.container():
             st.subheader('OpenAI')
             self.openai_api_key_value = st.text_input(f'OpenAI API Key',
-                                                      key='openai_api_key_input',
                                                       type='password',
-                                                      value=st.session_state.openai_api_key if 'openai_api_key' in st.session_state else ''
+                                                      value=st.session_state.openai_key if 'openai_key' in st.session_state else ''
                                                       )
 
         with main_container.container():
             st.subheader('Anthropic')
             self.anthropic_api_key_value = st.text_input(f'Anthropic API Key',
-                                                         key='anthropic_api_key_input',
                                                          type='password',
-                                                         value=st.session_state.anthropic_api_key if 'anthropic_api_key' in st.session_state else ''
+                                                         value=st.session_state.anthropic_key if 'anthropic_key' in st.session_state else ''
                                                          )
 
         # Simulation
         main_container.title('Simulation :magic_wand:')
-        type_of_court_case = main_container.selectbox('Type of court case', CourtCaseType.get_all())
+        type_of_court_case = main_container.selectbox('Type of court case',
+                                                      CourtCaseType.get_all(),
+                                                      CourtCaseType.index_of(
+                                                          st.session_state.court_type) if 'court_type' in st.session_state else 0
+                                                      )
 
         if CourtCaseType.get_by_name(type_of_court_case) == CourtCaseType.CIVIL:
             with main_container.container():
                 grid = grid_layout(2, 2, [1, 1])
 
                 with grid.container(border=True):
-                    st.subheader('Supervisor :brain:')
-                    self.supervisor_provider = st.selectbox('Supervisor provider', AiProvider.get_all())
-                    self.supervisor_model = st.selectbox('Supervisor model',
-                                                         AiModel.get_all_by_provider(self.supervisor_provider))
+                    self.supervisor_view()
                 with grid.container(border=True):
-                    st.subheader('Judge :judge:')
-                    self.judge_provider = st.selectbox('Judge provider', AiProvider.get_all())
-                    self.judge_model = st.selectbox('Judge model', AiModel.get_all_by_provider(self.judge_provider))
-
+                    self.judge_view()
                 with grid.container(border=True):
-                    st.subheader('Witness :adult:')
-                    self.witness_provider = st.selectbox('Witness provider', AiProvider.get_all())
-                    self.witness_model = st.selectbox('Witness model',
-                                                      AiModel.get_all_by_provider(self.witness_provider))
-
+                    self.witness_view()
                 with grid.container(border=True):
-                    st.subheader('Defense :shield:')
-                    self.defense_provider = st.selectbox('Defense provider', AiProvider.get_all())
-                    self.defense_model = st.selectbox('Defense model',
-                                                      AiModel.get_all_by_provider(self.defense_provider))
-
+                    self.defense_view()
                 with grid.container(border=True):
-                    st.subheader('Prosecutor :crossed_swords:')
-                    self.prosecutor_provider = st.selectbox('Prosecutor provider', AiProvider.get_all())
-                    self.prosecutor_model = st.selectbox('Prosecutor model',
-                                                         AiModel.get_all_by_provider(self.prosecutor_provider))
+                    self.prosecutor_view()
 
         else:
             with main_container.container():
                 grid = grid_layout(2, 2, 2)
 
                 with grid.container(border=True):
-                    st.subheader('Supervisor :brain:')
-                    self.supervisor_provider = st.selectbox('Supervisor provider', AiProvider.get_all())
-                    self.supervisor_model = st.selectbox('Supervisor model',
-                                                         AiModel.get_all_by_provider(self.supervisor_provider))
+                    self.supervisor_view()
                 with grid.container(border=True):
-                    st.subheader('Judge :judge:')
-                    self.judge_provider = st.selectbox('Judge provider', AiProvider.get_all())
-                    self.judge_model = st.selectbox('Judge model', AiModel.get_all_by_provider(self.judge_provider))
-
+                    self.judge_view()
                 with grid.container(border=True):
-                    st.subheader('Witness :adult:')
-                    self.witness_provider = st.selectbox('Witness provider', AiProvider.get_all())
-                    self.witness_model = st.selectbox('Witness model',
-                                                      AiModel.get_all_by_provider(self.witness_provider))
-
+                    self.witness_view()
                 with grid.container(border=True):
-                    st.subheader('Defense :shield:')
-                    self.defense_provider = st.selectbox('Defense provider', AiProvider.get_all())
-                    self.defense_model = st.selectbox('Defense model',
-                                                      AiModel.get_all_by_provider(self.defense_provider))
-
+                    self.defense_view()
                 with grid.container(border=True):
-                    st.subheader('Prosecutor :crossed_swords:')
-                    self.prosecutor_provider = st.selectbox('Prosecutor provider', AiProvider.get_all())
-                    self.prosecutor_model = st.selectbox('Prosecutor model',
-                                                         AiModel.get_all_by_provider(self.prosecutor_provider))
+                    self.prosecutor_view()
 
                 with grid.container(border=True):
                     st.subheader('Jury :shield:')
-                    self.jury_provider = st.selectbox('Jury provider', AiProvider.get_all())
-                    self.jury_model = st.selectbox('Jury model', AiModel.get_all_by_provider(self.jury_provider))
+                    self.jury_provider = st.selectbox('Jury provider',
+                                                      AiProvider.get_all(),
+                                                      AiProvider.index_of(
+                                                          st.session_state.jury_provider) if 'jury_provider' in st.session_state else 0
+                                                      )
+                    self.jury_model = st.selectbox('Jury model',
+                                                   AiModel.get_all_by_provider(self.jury_provider),
+                                                   AiModel.index_of(
+                                                       st.session_state.jury_model,
+                                                       self.jury_provider) if 'jury_model' in st.session_state else 0
+                                                   )
                     self.amount_of_juries = st.slider('Amount of juries', min_value=1, max_value=10, step=1,
-                                                      format='%d')
+                                                      format='%d',
+                                                      value=st.session_state.juries_amount if 'juries_amount' in st.session_state else 1)
 
         # Form Submit
         with main_container.columns([3, 3, 1])[2]:
@@ -162,24 +210,24 @@ class Settings:
         if submitted:
             if self.validate_form():
                 st.success('Saved')
-                AppState.save_open_ai_key(self.openai_api_key_value)
-                AppState.save_anthropic_key(self.anthropic_api_key_value)
-                AppState.save_court_type(CourtCaseType.get_by_name(type_of_court_case))
-                AppState.save_supervisor_provider(self.supervisor_provider)
-                AppState.save_judge_provider(self.judge_provider)
-                AppState.save_witness_provider(self.witness_provider)
-                AppState.save_defense_provider(self.defense_provider)
-                AppState.save_prosecutor_provider(self.prosecutor_provider)
-                AppState.save_supervisor_model(self.supervisor_model)
-                AppState.save_judge_model(self.judge_model)
-                AppState.save_witness_model(self.witness_model)
-                AppState.save_defense_model(self.defense_model)
-                AppState.save_prosecutor_model(self.prosecutor_model)
+                AppState.set_value('openai_key', self.openai_api_key_value)
+                AppState.set_value('anthropic_key', self.anthropic_api_key_value)
+                AppState.set_value('court_type', CourtCaseType.get_by_name(type_of_court_case))
+                AppState.set_value('supervisor_provider', self.supervisor_provider)
+                AppState.set_value('judge_provider', self.judge_provider)
+                AppState.set_value('witness_provider', self.witness_provider)
+                AppState.set_value('defense_provider', self.defense_provider)
+                AppState.set_value('prosecutor_provider', self.prosecutor_provider)
+                AppState.set_value('supervisor_model', self.supervisor_model)
+                AppState.set_value('judge_model', self.judge_model)
+                AppState.set_value('witness_model', self.witness_model)
+                AppState.set_value('defense_model', self.defense_model)
+                AppState.set_value('prosecutor_model', self.prosecutor_model)
 
                 if self.amount_of_juries is not None:
-                    AppState.save_jury_provider(self.jury_provider)
-                    AppState.save_jury_model(self.jury_model)
-                    AppState.save_juries_amount(self.amount_of_juries)
+                    AppState.set_value('jury_provider', self.jury_provider)
+                    AppState.set_value('jury_model', self.jury_model)
+                    AppState.set_value('juries_amount', self.amount_of_juries)
 
 
 settings = Settings()
