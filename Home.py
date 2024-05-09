@@ -1,4 +1,14 @@
 import streamlit as st
+from dotenv import load_dotenv
+
+st.set_page_config(
+    page_title='Home',
+    page_icon=':wave:',
+    layout='centered',
+    initial_sidebar_state='collapsed'
+)
+
+load_dotenv()
 
 
 class Home:

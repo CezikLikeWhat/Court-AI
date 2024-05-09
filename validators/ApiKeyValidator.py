@@ -1,3 +1,5 @@
+import os
+
 import anthropic
 import openai
 from anthropic import Anthropic
@@ -7,6 +9,9 @@ class ApiKeyValidator:
 
     @staticmethod
     def is_valid_open_ai_key(key: str) -> str | None:
+        if os.getenv('APP_ENV') == 'debug':
+            return None
+
         client = openai.OpenAI(api_key=key)
         try:
             client.models.list()
@@ -20,6 +25,9 @@ class ApiKeyValidator:
 
     @staticmethod
     def is_valid_anthropic_key(key: str) -> str | None:
+        if os.getenv('APP_ENV') == 'debug':
+            return None
+
         client = Anthropic(api_key=key)
         try:
             client.messages.create(

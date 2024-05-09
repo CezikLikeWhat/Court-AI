@@ -8,6 +8,13 @@ from state.AppState import AppState
 from validators.ApiKeyValidator import ApiKeyValidator
 from validators.SettingsFormValidator import SettingsFormValidator
 
+st.set_page_config(
+    page_title='Settings',
+    page_icon=':gear:',
+    layout='wide',
+    initial_sidebar_state='auto'
+)
+
 
 class Settings:
     openai_api_key_value = None
@@ -25,6 +32,7 @@ class Settings:
     defense_model = None
     prosecutor_model = None
     jury_model = None
+    type_of_court_case = None
 
     def __init__(self) -> None:
         self.view()
@@ -128,6 +136,45 @@ class Settings:
                                                  self.prosecutor_provider) if 'prosecutor_model' in st.session_state else 0
                                              )
 
+    def jury_view(self):
+        st.subheader('Jury :shield:')
+        self.jury_provider = st.selectbox('Jury provider',
+                                          AiProvider.get_all(),
+                                          AiProvider.index_of(
+                                              st.session_state.jury_provider) if 'jury_provider' in st.session_state else 0
+                                          )
+        self.jury_model = st.selectbox('Jury model',
+                                       AiModel.get_all_by_provider(self.jury_provider),
+                                       AiModel.index_of(
+                                           st.session_state.jury_model,
+                                           self.jury_provider) if 'jury_model' in st.session_state else 0
+                                       )
+        self.amount_of_juries = st.slider('Amount of juries', min_value=1, max_value=10, step=1,
+                                          format='%d',
+                                          value=st.session_state.juries_amount if 'juries_amount' in st.session_state else 1)
+
+    def submit_form(self):
+        st.success('Saved')
+        AppState.set_value('ready_to_start_simulation', True)
+        AppState.set_value('openai_key', self.openai_api_key_value)
+        AppState.set_value('anthropic_key', self.anthropic_api_key_value)
+        AppState.set_value('court_type', CourtCaseType.get_by_name(self.type_of_court_case))
+        AppState.set_value('supervisor_provider', self.supervisor_provider)
+        AppState.set_value('judge_provider', self.judge_provider)
+        AppState.set_value('witness_provider', self.witness_provider)
+        AppState.set_value('defense_provider', self.defense_provider)
+        AppState.set_value('prosecutor_provider', self.prosecutor_provider)
+        AppState.set_value('supervisor_model', self.supervisor_model)
+        AppState.set_value('judge_model', self.judge_model)
+        AppState.set_value('witness_model', self.witness_model)
+        AppState.set_value('defense_model', self.defense_model)
+        AppState.set_value('prosecutor_model', self.prosecutor_model)
+
+        if self.amount_of_juries is not None:
+            AppState.set_value('jury_provider', self.jury_provider)
+            AppState.set_value('jury_model', self.jury_model)
+            AppState.set_value('juries_amount', self.amount_of_juries)
+
     def view(self) -> None:
         main_container = st.container(border=True)
 
@@ -150,13 +197,13 @@ class Settings:
 
         # Simulation
         main_container.title('Simulation :magic_wand:')
-        type_of_court_case = main_container.selectbox('Type of court case',
-                                                      CourtCaseType.get_all(),
-                                                      CourtCaseType.index_of(
-                                                          st.session_state.court_type) if 'court_type' in st.session_state else 0
-                                                      )
+        self.type_of_court_case = main_container.selectbox('Type of court case',
+                                                           CourtCaseType.get_all(),
+                                                           CourtCaseType.index_of(
+                                                               st.session_state.court_type) if 'court_type' in st.session_state else 0
+                                                           )
 
-        if CourtCaseType.get_by_name(type_of_court_case) == CourtCaseType.CIVIL:
+        if CourtCaseType.get_by_name(self.type_of_court_case) == CourtCaseType.CIVIL:
             with main_container.container():
                 grid = grid_layout(2, 2, [1, 1])
 
@@ -187,21 +234,7 @@ class Settings:
                     self.prosecutor_view()
 
                 with grid.container(border=True):
-                    st.subheader('Jury :shield:')
-                    self.jury_provider = st.selectbox('Jury provider',
-                                                      AiProvider.get_all(),
-                                                      AiProvider.index_of(
-                                                          st.session_state.jury_provider) if 'jury_provider' in st.session_state else 0
-                                                      )
-                    self.jury_model = st.selectbox('Jury model',
-                                                   AiModel.get_all_by_provider(self.jury_provider),
-                                                   AiModel.index_of(
-                                                       st.session_state.jury_model,
-                                                       self.jury_provider) if 'jury_model' in st.session_state else 0
-                                                   )
-                    self.amount_of_juries = st.slider('Amount of juries', min_value=1, max_value=10, step=1,
-                                                      format='%d',
-                                                      value=st.session_state.juries_amount if 'juries_amount' in st.session_state else 1)
+                    self.jury_view()
 
         # Form Submit
         with main_container.columns([3, 3, 1])[2]:
@@ -209,25 +242,7 @@ class Settings:
 
         if submitted:
             if self.validate_form():
-                st.success('Saved')
-                AppState.set_value('openai_key', self.openai_api_key_value)
-                AppState.set_value('anthropic_key', self.anthropic_api_key_value)
-                AppState.set_value('court_type', CourtCaseType.get_by_name(type_of_court_case))
-                AppState.set_value('supervisor_provider', self.supervisor_provider)
-                AppState.set_value('judge_provider', self.judge_provider)
-                AppState.set_value('witness_provider', self.witness_provider)
-                AppState.set_value('defense_provider', self.defense_provider)
-                AppState.set_value('prosecutor_provider', self.prosecutor_provider)
-                AppState.set_value('supervisor_model', self.supervisor_model)
-                AppState.set_value('judge_model', self.judge_model)
-                AppState.set_value('witness_model', self.witness_model)
-                AppState.set_value('defense_model', self.defense_model)
-                AppState.set_value('prosecutor_model', self.prosecutor_model)
-
-                if self.amount_of_juries is not None:
-                    AppState.set_value('jury_provider', self.jury_provider)
-                    AppState.set_value('jury_model', self.jury_model)
-                    AppState.set_value('juries_amount', self.amount_of_juries)
+                self.submit_form()
 
 
 settings = Settings()
