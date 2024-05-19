@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 import streamlit as st
 
@@ -14,3 +14,13 @@ class AppState(metaclass=SingletonMeta):
     @staticmethod
     def set_value(key: str, value: Any) -> None:
         st.session_state[key] = value
+
+    # TODO: Przetestować czy set_multiple działa poprawnie
+    @staticmethod
+    def set_multiple(values: Dict[str, Any]) -> None:
+        for key, value in values.items():
+            AppState.set_value(key, value)
+
+    @staticmethod
+    def clear(key: str) -> None:
+        st.session_state[key] = None

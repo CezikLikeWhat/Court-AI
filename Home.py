@@ -5,7 +5,7 @@ st.set_page_config(
     page_title='Home',
     page_icon=':wave:',
     layout='centered',
-    initial_sidebar_state='collapsed'
+    initial_sidebar_state='auto'
 )
 
 load_dotenv()

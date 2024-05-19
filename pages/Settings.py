@@ -137,7 +137,7 @@ class Settings:
                                              )
 
     def jury_view(self):
-        st.subheader('Jury :shield:')
+        st.subheader('Jury :memo:')
         self.jury_provider = st.selectbox('Jury provider',
                                           AiProvider.get_all(),
                                           AiProvider.index_of(
