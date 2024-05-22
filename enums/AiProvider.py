@@ -5,12 +5,14 @@ from typing import List
 class AiProvider(str, Enum):
     OPEN_AI = 'OpenAI'
     ANTHROPIC = 'Anthropic'
+    OLLAMA = 'Ollama'
 
     @classmethod
     def get_all(cls: 'AiProvider') -> List[str]:
         return [
             AiProvider.OPEN_AI.value,
-            AiProvider.ANTHROPIC.value
+            AiProvider.ANTHROPIC.value,
+            AiProvider.OLLAMA.value
         ]
 
     @classmethod

@@ -10,3 +10,6 @@ __pycache__/
 
 # ENV
 .env
+
+# TODO's file
+TODO.md

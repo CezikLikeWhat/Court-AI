@@ -2,10 +2,16 @@ import json
 from typing import List, Union, Tuple, Dict
 
 from crewai import Crew, Agent, Task, Process
+from langchain_community.chat_models import ChatOllama
 from langchain_core.agents import AgentFinish
 
 agent_finishes = []
 call_number = 0
+
+OLLAMA = ChatOllama(
+    base_url='http://localhost:11434',
+    model='llama3'
+)
 
 
 def print_output(agent_output: Union[str, List[Tuple[Dict, str]], AgentFinish], agent_name: str = 'Generic call'):
@@ -43,20 +49,15 @@ def print_output(agent_output: Union[str, List[Tuple[Dict, str]], AgentFinish], 
 
 
 class CourtCrew:
-    crew: Crew
-
-    def __init__(self, agents: List[Agent], tasks: List[Task]):
-        self.crew = Crew(
+    def get_crew(self, agents: List[Agent], tasks: List[Task]):
+        return Crew(
             agents=agents,
             tasks=tasks,
-            process=Process.hierarchical,
+            process=Process.sequential,
             verbose=2,
             share_crew=False,
             full_output=True,
-            manager_llm=[],
+            manager_llm=OLLAMA,
             max_iter=15,
             step_callback=lambda x: print_output(x, 'SuperVisor')
         )
-
-    def get_crew(self):
-        return self.crew

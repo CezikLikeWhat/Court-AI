@@ -71,7 +71,7 @@ class Settings:
         self.supervisor_provider = st.selectbox('Supervisor provider',
                                                 AiProvider.get_all(),
                                                 AiProvider.index_of(
-                                                    st.session_state.supervisor_provider) if 'supervisor_provider' in st.session_state else 0
+                                                    st.session_state.supervisor_provider) if 'supervisor_provider' in st.session_state else 2
                                                 )
         self.supervisor_model = st.selectbox('Supervisor model',
                                              AiModel.get_all_by_provider(self.supervisor_provider),
@@ -85,7 +85,7 @@ class Settings:
         self.judge_provider = st.selectbox('Judge provider',
                                            AiProvider.get_all(),
                                            AiProvider.index_of(
-                                               st.session_state.judge_provider) if 'judge_provider' in st.session_state else 0
+                                               st.session_state.judge_provider) if 'judge_provider' in st.session_state else 2
                                            )
         self.judge_model = st.selectbox('Judge model',
                                         AiModel.get_all_by_provider(self.judge_provider),
@@ -99,7 +99,7 @@ class Settings:
         self.witness_provider = st.selectbox('Witness provider',
                                              AiProvider.get_all(),
                                              AiProvider.index_of(
-                                                 st.session_state.witness_provider) if 'witness_provider' in st.session_state else 0
+                                                 st.session_state.witness_provider) if 'witness_provider' in st.session_state else 2
                                              )
         self.witness_model = st.selectbox('Witness model',
                                           AiModel.get_all_by_provider(self.witness_provider),
@@ -113,7 +113,7 @@ class Settings:
         self.defense_provider = st.selectbox('Defense provider',
                                              AiProvider.get_all(),
                                              AiProvider.index_of(
-                                                 st.session_state.defense_provider) if 'defense_provider' in st.session_state else 0
+                                                 st.session_state.defense_provider) if 'defense_provider' in st.session_state else 2
                                              )
         self.defense_model = st.selectbox('Defense model',
                                           AiModel.get_all_by_provider(self.defense_provider),
@@ -127,7 +127,7 @@ class Settings:
         self.prosecutor_provider = st.selectbox('Prosecutor provider',
                                                 AiProvider.get_all(),
                                                 AiProvider.index_of(
-                                                    st.session_state.prosecutor_provider) if 'prosecutor_provider' in st.session_state else 0
+                                                    st.session_state.prosecutor_provider) if 'prosecutor_provider' in st.session_state else 2
                                                 )
         self.prosecutor_model = st.selectbox('Prosecutor model',
                                              AiModel.get_all_by_provider(self.prosecutor_provider),
@@ -141,7 +141,7 @@ class Settings:
         self.jury_provider = st.selectbox('Jury provider',
                                           AiProvider.get_all(),
                                           AiProvider.index_of(
-                                              st.session_state.jury_provider) if 'jury_provider' in st.session_state else 0
+                                              st.session_state.jury_provider) if 'jury_provider' in st.session_state else 2
                                           )
         self.jury_model = st.selectbox('Jury model',
                                        AiModel.get_all_by_provider(self.jury_provider),
@@ -232,7 +232,6 @@ class Settings:
                     self.defense_view()
                 with grid.container(border=True):
                     self.prosecutor_view()
-
                 with grid.container(border=True):
                     self.jury_view()
 

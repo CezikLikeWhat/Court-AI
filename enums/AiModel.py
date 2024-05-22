@@ -11,6 +11,7 @@ class AiModel(str, Enum):
     ANTHROPIC_CLAUDE_HAIKU = 'Claude Haiku'
     ANTHROPIC_CLAUDE_SONNET = 'Claude Sonnet'
     ANTHROPIC_CLAUDE_OPUS = 'Claude Opus'
+    LLAMA_3_8B = 'Llama 3 (8B)'
 
     @classmethod
     def get_all_by_provider(cls, provider: AiProvider) -> List[str]:
@@ -25,6 +26,9 @@ class AiModel(str, Enum):
                 cls.ANTHROPIC_CLAUDE_SONNET.value,
                 cls.ANTHROPIC_CLAUDE_OPUS.value,
             ],
+            AiProvider.OLLAMA: [
+                cls.LLAMA_3_8B.value
+            ]
         }
         return model_map.get(provider, [])
 
@@ -37,6 +41,7 @@ class AiModel(str, Enum):
             cls.ANTHROPIC_CLAUDE_HAIKU: 'claude-3-haiku-20240307',
             cls.ANTHROPIC_CLAUDE_SONNET: 'claude-3-sonnet-20240229',
             cls.ANTHROPIC_CLAUDE_OPUS: 'claude-3-opus-20240229',
+            cls.LLAMA_3_8B: 'llama3'
         }
         return tech_name_map.get(ai_model, '')
 
