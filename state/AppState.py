@@ -15,9 +15,8 @@ class AppState(metaclass=SingletonMeta):
     def set_value(key: str, value: Any) -> None:
         st.session_state[key] = value
 
-    # TODO: Przetestować czy set_multiple działa poprawnie
     @staticmethod
-    def set_multiple(values: Dict[str, Any]) -> None:
+    def set_multiple_values(values: Dict[str, Any]) -> None:
         for key, value in values.items():
             AppState.set_value(key, value)
 

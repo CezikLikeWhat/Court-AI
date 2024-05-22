@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 from typing import Callable, List
 
@@ -16,7 +17,6 @@ agent_callback = Callable[[str], None]
 
 
 class BaseAgent(ABC):
-    # temperature: int = NotImplemented
     callback: agent_callback = NotImplemented
     llm: BaseChatModel = NotImplemented
     tools: List[BaseTool] = NotImplemented
@@ -172,8 +172,6 @@ class JuryAgent(BaseAgent):
 
 
 class AgentsManager:
-    # temperature = AppState.get_value(f'{agent_name}_temperature') # TODO: Dodać w całej aplikacji i dodać do obiektów poniżej
-
     def get_judge_agent(self, callback: agent_callback) -> Agent:
         agent = JudgeAgent(
             callback,
@@ -223,41 +221,49 @@ class AgentsManager:
         model = AppState.get_value(f'{agent_name.value.lower()}_model')
         open_ai_api_key = AppState.get_value('openai_key')
         anthropic_api_key = AppState.get_value('anthropic_key')
+        temperature = AppState.get_value(f'{agent_name.value.lower()}_temperature')
 
         match model:
             case AiModel.OPEN_AI_GPT_35_TURBO:
                 return ChatOpenAI(
                     api_key=open_ai_api_key,
-                    model=AiModel.get_tech_name(AiModel.OPEN_AI_GPT_35_TURBO)
+                    model=AiModel.get_tech_name(AiModel.OPEN_AI_GPT_35_TURBO),
+                    temperature=temperature
                 )
             case AiModel.OPEN_AI_GPT_4_TURBO:
                 return ChatOpenAI(
                     api_key=open_ai_api_key,
-                    model=AiModel.get_tech_name(AiModel.OPEN_AI_GPT_4_TURBO)
+                    model=AiModel.get_tech_name(AiModel.OPEN_AI_GPT_4_TURBO),
+                    temperature=temperature
                 )
             case AiModel.OPEN_AI_GPT_4_O:
                 return ChatOpenAI(
                     api_key=open_ai_api_key,
-                    model=AiModel.get_tech_name(AiModel.OPEN_AI_GPT_4_O)
+                    model=AiModel.get_tech_name(AiModel.OPEN_AI_GPT_4_O),
+                    temperature=temperature
                 )
             case AiModel.ANTHROPIC_CLAUDE_HAIKU:
                 return ChatAnthropic(
                     api_key=anthropic_api_key,
-                    model_name=AiModel.get_tech_name(AiModel.ANTHROPIC_CLAUDE_HAIKU)
+                    model_name=AiModel.get_tech_name(AiModel.ANTHROPIC_CLAUDE_HAIKU),
+                    temperature=temperature
                 )
             case AiModel.ANTHROPIC_CLAUDE_SONNET:
                 return ChatAnthropic(
                     api_key=anthropic_api_key,
-                    model_name=AiModel.get_tech_name(AiModel.ANTHROPIC_CLAUDE_SONNET)
+                    model_name=AiModel.get_tech_name(AiModel.ANTHROPIC_CLAUDE_SONNET),
+                    temperature=temperature
                 )
             case AiModel.ANTHROPIC_CLAUDE_OPUS:
                 return ChatAnthropic(
                     api_key=anthropic_api_key,
-                    model_name=AiModel.get_tech_name(AiModel.ANTHROPIC_CLAUDE_OPUS)
+                    model_name=AiModel.get_tech_name(AiModel.ANTHROPIC_CLAUDE_OPUS),
+                    temperature=temperature
                 )
             case AiModel.LLAMA_3_8B:
                 return ChatOllama(
-                    base_url='http://localhost:11434',
+                    base_url=os.getenv('OLLAMA_URL'),
                     model='llama3',
-                    stream=True
+                    temperature=temperature,
+                    stream=False
                 )

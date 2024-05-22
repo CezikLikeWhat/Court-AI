@@ -17,22 +17,28 @@ st.set_page_config(
 
 
 class Settings:
-    openai_api_key_value = None
-    anthropic_api_key_value = None
-    supervisor_provider = None
-    judge_provider = None
-    witness_provider = None
-    defense_provider = None
-    prosecutor_provider = None
-    jury_provider = None
-    amount_of_juries = None
-    supervisor_model = None
-    judge_model = None
-    witness_model = None
-    defense_model = None
-    prosecutor_model = None
-    jury_model = None
-    type_of_court_case = None
+    openai_api_key_value: str = None
+    anthropic_api_key_value: str = None
+    supervisor_provider: AiProvider = None
+    supervisor_model: AiModel = None
+    supervisor_temperature: float = None
+    judge_provider: AiProvider = None
+    judge_model: AiModel = None
+    judge_temperature: float = None
+    witness_provider: AiProvider = None
+    witness_model: AiModel = None
+    witness_temperature: float = None
+    defense_provider: AiProvider = None
+    defense_model: AiModel = None
+    defense_temperature: float = None
+    prosecutor_provider: AiProvider = None
+    prosecutor_model: AiModel = None
+    prosecutor_temperature: float = None
+    jury_provider: AiProvider = None
+    jury_model: AiModel = None
+    jury_temperature: float = None
+    amount_of_juries: int = None
+    type_of_court_case: CourtCaseType = None
 
     def __init__(self) -> None:
         self.view()
@@ -68,112 +74,205 @@ class Settings:
 
     def supervisor_view(self):
         st.subheader('Supervisor :brain:')
-        self.supervisor_provider = st.selectbox('Supervisor provider',
-                                                AiProvider.get_all(),
-                                                AiProvider.index_of(
-                                                    st.session_state.supervisor_provider) if 'supervisor_provider' in st.session_state else 2
+        self.supervisor_provider = st.selectbox('Provider',
+                                                options=AiProvider.get_all(),
+                                                index=AiProvider.index_of(
+                                                    st.session_state.supervisor_provider) if 'supervisor_provider' in st.session_state else 2,
+                                                help='Select a LLM (Large Language Model) provider.',
+                                                key=1
                                                 )
-        self.supervisor_model = st.selectbox('Supervisor model',
-                                             AiModel.get_all_by_provider(self.supervisor_provider),
-                                             AiModel.index_of(
+        self.supervisor_model = st.selectbox('Model',
+                                             options=AiModel.get_all_by_provider(self.supervisor_provider),
+                                             index=AiModel.index_of(
                                                  st.session_state.supervisor_model,
-                                                 self.supervisor_provider) if 'supervisor_model' in st.session_state else 0
+                                                 self.supervisor_provider) if 'supervisor_model' in st.session_state else 0,
+                                             help='Select a specific LLM (Large Language Model) model.',
+                                             key=2
                                              )
+        self.supervisor_temperature = st.slider('Temperature',
+                                                min_value=0.0,
+                                                max_value=1.0,
+                                                value=0.7,
+                                                step=0.1,
+                                                format='%.1f',
+                                                help='Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.',
+                                                key=3
+                                                )
 
     def judge_view(self):
         st.subheader('Judge :judge:')
-        self.judge_provider = st.selectbox('Judge provider',
-                                           AiProvider.get_all(),
-                                           AiProvider.index_of(
-                                               st.session_state.judge_provider) if 'judge_provider' in st.session_state else 2
+        self.judge_provider = st.selectbox('Provider',
+                                           options=AiProvider.get_all(),
+                                           index=AiProvider.index_of(
+                                               st.session_state.judge_provider) if 'judge_provider' in st.session_state else 2,
+                                           help='Select a LLM (Large Language Model) provider.',
+                                           key=4
                                            )
-        self.judge_model = st.selectbox('Judge model',
-                                        AiModel.get_all_by_provider(self.judge_provider),
-                                        AiModel.index_of(
+        self.judge_model = st.selectbox('Model',
+                                        options=AiModel.get_all_by_provider(self.judge_provider),
+                                        index=AiModel.index_of(
                                             st.session_state.judge_model,
-                                            self.judge_provider) if 'judge_model' in st.session_state else 0
+                                            self.judge_provider) if 'judge_model' in st.session_state else 0,
+                                        help='Select a specific LLM (Large Language Model) model.',
+                                        key=5
                                         )
+        self.judge_temperature = st.slider('Temperature',
+                                           min_value=0.0,
+                                           max_value=1.0,
+                                           value=0.7,
+                                           step=0.1,
+                                           format='%.1f',
+                                           help='Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.',
+                                           key=6
+                                           )
 
     def witness_view(self):
         st.subheader('Witness :adult:')
-        self.witness_provider = st.selectbox('Witness provider',
-                                             AiProvider.get_all(),
-                                             AiProvider.index_of(
-                                                 st.session_state.witness_provider) if 'witness_provider' in st.session_state else 2
+        self.witness_provider = st.selectbox('Provider',
+                                             options=AiProvider.get_all(),
+                                             index=AiProvider.index_of(
+                                                 st.session_state.witness_provider) if 'witness_provider' in st.session_state else 2,
+                                             help='Select a LLM (Large Language Model) provider.',
+                                             key=7
                                              )
-        self.witness_model = st.selectbox('Witness model',
-                                          AiModel.get_all_by_provider(self.witness_provider),
-                                          AiModel.index_of(
+        self.witness_model = st.selectbox('Model',
+                                          options=AiModel.get_all_by_provider(self.witness_provider),
+                                          index=AiModel.index_of(
                                               st.session_state.witness_model,
-                                              self.witness_provider) if 'witness_model' in st.session_state else 0
+                                              self.witness_provider) if 'witness_model' in st.session_state else 0,
+                                          help='Select a specific LLM (Large Language Model) model.',
+                                          key=8
                                           )
+        self.witness_temperature = st.slider('Temperature',
+                                             min_value=0.0,
+                                             max_value=1.0,
+                                             value=0.7,
+                                             step=0.1,
+                                             format='%.1f',
+                                             help='Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.',
+                                             key=9
+                                             )
 
     def defense_view(self):
         st.subheader('Defense :shield:')
-        self.defense_provider = st.selectbox('Defense provider',
-                                             AiProvider.get_all(),
-                                             AiProvider.index_of(
-                                                 st.session_state.defense_provider) if 'defense_provider' in st.session_state else 2
+        self.defense_provider = st.selectbox('Provider',
+                                             options=AiProvider.get_all(),
+                                             index=AiProvider.index_of(
+                                                 st.session_state.defense_provider) if 'defense_provider' in st.session_state else 2,
+                                             help='Select a LLM (Large Language Model) provider.',
+                                             key=10
                                              )
-        self.defense_model = st.selectbox('Defense model',
-                                          AiModel.get_all_by_provider(self.defense_provider),
-                                          AiModel.index_of(
+        self.defense_model = st.selectbox('Model',
+                                          options=AiModel.get_all_by_provider(self.defense_provider),
+                                          index=AiModel.index_of(
                                               st.session_state.defense_model,
-                                              self.defense_provider) if 'defense_model' in st.session_state else 0
+                                              self.defense_provider) if 'defense_model' in st.session_state else 0,
+                                          help='Select a specific LLM (Large Language Model) model.',
+                                          key=11
                                           )
+        self.defense_temperature = st.slider('Temperature',
+                                             min_value=0.0,
+                                             max_value=1.0,
+                                             value=0.7,
+                                             step=0.1,
+                                             format='%.1f',
+                                             help='Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.',
+                                             key=12
+                                             )
 
     def prosecutor_view(self):
         st.subheader('Prosecutor :crossed_swords:')
-        self.prosecutor_provider = st.selectbox('Prosecutor provider',
-                                                AiProvider.get_all(),
-                                                AiProvider.index_of(
-                                                    st.session_state.prosecutor_provider) if 'prosecutor_provider' in st.session_state else 2
+        self.prosecutor_provider = st.selectbox('Provider',
+                                                options=AiProvider.get_all(),
+                                                index=AiProvider.index_of(
+                                                    st.session_state.prosecutor_provider) if 'prosecutor_provider' in st.session_state else 2,
+                                                help='Select a LLM (Large Language Model) provider.',
+                                                key=13
                                                 )
-        self.prosecutor_model = st.selectbox('Prosecutor model',
-                                             AiModel.get_all_by_provider(self.prosecutor_provider),
-                                             AiModel.index_of(
+        self.prosecutor_model = st.selectbox('Model',
+                                             options=AiModel.get_all_by_provider(self.prosecutor_provider),
+                                             index=AiModel.index_of(
                                                  st.session_state.prosecutor_model,
-                                                 self.prosecutor_provider) if 'prosecutor_model' in st.session_state else 0
+                                                 self.prosecutor_provider) if 'prosecutor_model' in st.session_state else 0,
+                                             help='Select a specific LLM (Large Language Model) model.',
+                                             key=14
                                              )
+        self.prosecutor_temperature = st.slider('Temperature',
+                                                min_value=0.0,
+                                                max_value=1.0,
+                                                value=0.7,
+                                                step=0.1,
+                                                format='%.1f',
+                                                help='Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.',
+                                                key=15
+                                                )
 
     def jury_view(self):
         st.subheader('Jury :memo:')
-        self.jury_provider = st.selectbox('Jury provider',
-                                          AiProvider.get_all(),
-                                          AiProvider.index_of(
-                                              st.session_state.jury_provider) if 'jury_provider' in st.session_state else 2
+        self.jury_provider = st.selectbox('Provider',
+                                          options=AiProvider.get_all(),
+                                          index=AiProvider.index_of(
+                                              st.session_state.jury_provider) if 'jury_provider' in st.session_state else 2,
+                                          help='Select a LLM (Large Language Model) provider.',
+                                          key=16
                                           )
-        self.jury_model = st.selectbox('Jury model',
-                                       AiModel.get_all_by_provider(self.jury_provider),
-                                       AiModel.index_of(
+        self.jury_model = st.selectbox('Model',
+                                       options=AiModel.get_all_by_provider(self.jury_provider),
+                                       index=AiModel.index_of(
                                            st.session_state.jury_model,
-                                           self.jury_provider) if 'jury_model' in st.session_state else 0
+                                           self.jury_provider) if 'jury_model' in st.session_state else 0,
+                                       help='Select a specific LLM (Large Language Model) model.',
+                                       key=17
                                        )
-        self.amount_of_juries = st.slider('Amount of juries', min_value=1, max_value=10, step=1,
+        self.jury_temperature = st.slider('Temperature',
+                                          min_value=0.0,
+                                          max_value=1.0,
+                                          value=0.7,
+                                          step=0.1,
+                                          format='%.1f',
+                                          help='Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.',
+                                          key=18
+                                          )
+        self.amount_of_juries = st.slider('Amount of juries',
+                                          min_value=1,
+                                          max_value=10,
+                                          value=st.session_state.juries_amount if 'juries_amount' in st.session_state else 1,
+                                          step=1,
                                           format='%d',
-                                          value=st.session_state.juries_amount if 'juries_amount' in st.session_state else 1)
+                                          help='Determines the number of agents created to act as members of the jury (the greater the number, the greater the cost of the simulation may be).'
+                                          )
 
     def submit_form(self):
         st.success('Saved')
-        AppState.set_value('ready_to_start_simulation', True)
-        AppState.set_value('openai_key', self.openai_api_key_value)
-        AppState.set_value('anthropic_key', self.anthropic_api_key_value)
-        AppState.set_value('court_type', CourtCaseType.get_by_name(self.type_of_court_case))
-        AppState.set_value('supervisor_provider', self.supervisor_provider)
-        AppState.set_value('judge_provider', self.judge_provider)
-        AppState.set_value('witness_provider', self.witness_provider)
-        AppState.set_value('defense_provider', self.defense_provider)
-        AppState.set_value('prosecutor_provider', self.prosecutor_provider)
-        AppState.set_value('supervisor_model', self.supervisor_model)
-        AppState.set_value('judge_model', self.judge_model)
-        AppState.set_value('witness_model', self.witness_model)
-        AppState.set_value('defense_model', self.defense_model)
-        AppState.set_value('prosecutor_model', self.prosecutor_model)
+        AppState.set_multiple_values({
+            'ready_to_start_simulation': True,
+            'openai_key': self.openai_api_key_value,
+            'anthropic_key': self.anthropic_api_key_value,
+            'supervisor_provider': self.supervisor_provider,
+            'supervisor_model': self.supervisor_model,
+            'supervisor_temperature': self.supervisor_temperature,
+            'judge_provider': self.judge_provider,
+            'judge_model': self.judge_model,
+            'judge_temperature': self.judge_temperature,
+            'witness_provider': self.witness_provider,
+            'witness_model': self.witness_model,
+            'witness_temperature': self.witness_temperature,
+            'defense_provider': self.defense_provider,
+            'defense_model': self.defense_model,
+            'defense_temperature': self.defense_temperature,
+            'prosecutor_provider': self.prosecutor_provider,
+            'prosecutor_model': self.prosecutor_model,
+            'prosecutor_temperature': self.prosecutor_temperature,
+            'court_type': CourtCaseType.get_by_name(self.type_of_court_case)
+        })
 
         if self.amount_of_juries is not None:
-            AppState.set_value('jury_provider', self.jury_provider)
-            AppState.set_value('jury_model', self.jury_model)
-            AppState.set_value('juries_amount', self.amount_of_juries)
+            AppState.set_multiple_values({
+                'jury_provider': self.jury_provider,
+                'jury_model': self.jury_model,
+                'jury_temperature': self.jury_temperature,
+                'juries_amount': self.amount_of_juries
+            })
 
     def view(self) -> None:
         main_container = st.container(border=True)
