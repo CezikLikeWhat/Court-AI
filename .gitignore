@@ -13,3 +13,6 @@ __pycache__/
 
 # TODO's file
 TODO.md
+
+# Logs
+logs/

@@ -1,6 +1,6 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Callable, List
+from typing import List
 
 from crewai import Agent
 from langchain_anthropic import ChatAnthropic
@@ -13,21 +13,16 @@ from enums.AgentPurpose import AgentPurpose
 from enums.AiModel import AiModel
 from state.AppState import AppState
 
-agent_callback = Callable[[str], None]
-
 
 class BaseAgent(ABC):
-    callback: agent_callback = NotImplemented
     llm: BaseChatModel = NotImplemented
     tools: List[BaseTool] = NotImplemented
 
     @abstractmethod
     def __init__(self,
-                 callback: agent_callback,
                  llm: BaseChatModel,
                  tools: List[BaseTool]
                  ) -> None:
-        self.callback = callback
         self.llm = llm
         self.tools = tools
 
@@ -38,11 +33,9 @@ class BaseAgent(ABC):
 
 class JudgeAgent(BaseAgent):
     def __init__(self,
-                 callback: agent_callback,
                  llm: BaseChatModel,
                  tools: List[BaseTool]
                  ) -> None:
-        self.callback = callback
         self.llm = llm
         self.tools = tools
 
@@ -58,18 +51,15 @@ class JudgeAgent(BaseAgent):
             verbose=True,
             memory=True,
             allow_delegation=True,
-            step_callback=self.callback,
             cache=True
         )
 
 
 class WitnessAgent(BaseAgent):
     def __init__(self,
-                 callback: agent_callback,
                  llm: BaseChatModel,
                  tools: List[BaseTool]
                  ) -> None:
-        self.callback = callback
         self.llm = llm
         self.tools = tools
 
@@ -85,18 +75,15 @@ class WitnessAgent(BaseAgent):
             verbose=True,
             memory=True,
             allow_delegation=True,
-            step_callback=self.callback,
             cache=True
         )
 
 
 class ProsecutionAgent(BaseAgent):
     def __init__(self,
-                 callback: agent_callback,
                  llm: BaseChatModel,
                  tools: List[BaseTool]
                  ) -> None:
-        self.callback = callback
         self.llm = llm
         self.tools = tools
 
@@ -112,18 +99,15 @@ class ProsecutionAgent(BaseAgent):
             verbose=True,
             memory=True,
             allow_delegation=True,
-            step_callback=self.callback,
             cache=True
         )
 
 
 class DefenseAgent(BaseAgent):
     def __init__(self,
-                 callback: agent_callback,
                  llm: BaseChatModel,
                  tools: List[BaseTool]
                  ) -> None:
-        self.callback = callback
         self.llm = llm
         self.tools = tools
 
@@ -139,18 +123,15 @@ class DefenseAgent(BaseAgent):
             verbose=True,
             memory=True,
             allow_delegation=True,
-            step_callback=self.callback,
             cache=True
         )
 
 
 class JuryAgent(BaseAgent):
     def __init__(self,
-                 callback: agent_callback,
                  llm: BaseChatModel,
                  tools: List[BaseTool]
                  ) -> None:
-        self.callback = callback
         self.llm = llm
         self.tools = tools
 
@@ -166,51 +147,45 @@ class JuryAgent(BaseAgent):
             verbose=True,
             memory=True,
             allow_delegation=True,
-            step_callback=self.callback,
             cache=True
         )
 
 
-class AgentsManager:
-    def get_judge_agent(self, callback: agent_callback) -> Agent:
+class AgentsFactory:
+    def judge_agent(self) -> Agent:
         agent = JudgeAgent(
-            callback,
             self._get_llm_by_choose(AgentPurpose.JUDGE),
             []
         )
 
         return agent.create()
 
-    def get_jury_agent(self, callback: agent_callback) -> Agent:
+    def jury_agent(self) -> Agent:
         agent = JuryAgent(
-            callback,
             self._get_llm_by_choose(AgentPurpose.JURY),
             []
         )
 
         return agent.create()
 
-    def get_witness_agent(self, callback: agent_callback) -> Agent:
+    def witness_agent(self) -> Agent:
         agent = WitnessAgent(
-            callback,
             self._get_llm_by_choose(AgentPurpose.WITNESS),
             []
         )
 
         return agent.create()
 
-    def get_prosecution_agent(self, callback: agent_callback) -> Agent:
+    def prosecution_agent(self) -> Agent:
         agent = ProsecutionAgent(
-            callback,
             self._get_llm_by_choose(AgentPurpose.PROSECUTOR),
             []
         )
 
         return agent.create()
 
-    def get_defense_agent(self, callback: agent_callback) -> Agent:
+    def defense_agent(self) -> Agent:
         agent = DefenseAgent(
-            callback,
             self._get_llm_by_choose(AgentPurpose.DEFENSE),
             []
         )

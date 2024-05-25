@@ -17,7 +17,7 @@ OLLAMA = ChatOllama(
 def print_output(agent_output: Union[str, List[Tuple[Dict, str]], AgentFinish], agent_name: str = 'Generic call'):
     global call_number
     call_number += 1
-    with open('../logs/callback_logs.txt', 'a') as log_file:
+    with open('./logs/callback_logs.txt', 'a') as log_file:
         if isinstance(agent_output, str):
             try:
                 agent_output = json.loads(agent_output)
