@@ -1,7 +1,7 @@
 from langchain_community.tools import DuckDuckGoSearchRun
 
 
-class ToolsManager:
+class ToolsFactory:
     @staticmethod
     def get_duckduck_go_tool() -> DuckDuckGoSearchRun:
         return DuckDuckGoSearchRun()

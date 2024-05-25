@@ -6,7 +6,7 @@ from streamlit_extras.row import row
 from crew.Agents import AgentsFactory
 from crew.Crew import CourtCrew
 from crew.Tasks import TasksFactory
-from crew.Tools import ToolsManager
+from crew.Tools import ToolsFactory
 from enums.CourtCaseType import CourtCaseType
 from state.AppState import AppState
 
@@ -71,10 +71,10 @@ class Court:
 
     @st.experimental_dialog('Case description', width='large')
     def case_description_modal(self) -> None:
-        user_case_description = st.text_area('Description:', max_chars=10000, height=200,
-                                             placeholder='Explain what the case is about. Include all important information, as it may affect the final judgment.')
+        case_description = st.text_area('Description:', max_chars=5000, height=200,
+                                        placeholder='Explain what the case is about. Include all important information, as it may affect the final judgment.')
         if st.button("Submit"):
-            AppState.set_value('user_case_description', user_case_description)
+            AppState.set_value('case_description', case_description)
             st.rerun()
 
     def judge_view(self, grid: grid_layout):
@@ -110,7 +110,7 @@ class Court:
     def clear_simulation(self):
         for container_name in ['judge', 'witness', 'prosecution', 'defense', 'jury']:
             AppState.clear(f'{container_name}_chat_message')
-        AppState.clear('user_case_description')
+        AppState.clear('case_description')
         AppState.clear('disable_start_simulation_button')
         AppState.clear('task_order_counter')
 
@@ -118,48 +118,57 @@ class Court:
         AppState.set_value('disable_start_simulation_button', True)
         AppState.set_value('task_order_counter', 0)
         agents_factory = AgentsFactory()
-        tasks_manager = TasksFactory()
-        tools_manager = ToolsManager()
+        tasks_factory = TasksFactory()
+        tools_factory = ToolsFactory()
 
         judge_agent = agents_factory.judge_agent()
         # judge_agent.tools = [
         #     tools_manager.get_duckduck_go_tool()
         # ]
-        # witness_agent = agents_manager.get_witness_agent(partial(self.chat_view, 'witness'))
-        # prosecution_agent = agents_manager.get_prosecution_agent(partial(self.chat_view, 'prosecution'))
+        witness_agent = agents_factory.witness_agent()
+        prosecution_agent = agents_factory.prosecution_agent()
         # prosecution_agent.tools = [
         #     tools_manager.get_duckduck_go_tool()
         # ]
-        # defense_agent = agents_manager.get_defense_agent(partial(self.chat_view, 'defense'))
+        defense_agent = agents_factory.defense_agent()
         # defense_agent.tools = [
         #     tools_manager.get_duckduck_go_tool()
         # ]
 
-        judge_tasks = tasks_manager.get_judge_tasks(judge_agent, chat_view_wrapper('judge', self.judge_container))
-        # witness_tasks = tasks_manager.get_witness_task(witness_agent)
-        # prosecution_tasks = tasks_manager.get_prosecution_task(prosecution_agent)
-        # defense_tasks = tasks_manager.get_defense_task(defense_agent)
+        judge_tasks = tasks_factory.get_judge_tasks(
+            judge_agent,
+            chat_view_wrapper('judge', self.judge_container)
+        )
+        witness_tasks = tasks_factory.get_witness_task(
+            witness_agent,
+            chat_view_wrapper('witness', self.witness_container)
+        )
+        prosecution_tasks = tasks_factory.get_prosecution_task(
+            prosecution_agent,
+            chat_view_wrapper('prosecution', self.prosecution_container)
+        )
+        defense_tasks = tasks_factory.get_defense_task(
+            defense_agent,
+            chat_view_wrapper('defense', self.defense_container)
+        )
 
-        # if AppState.get_value('court_type') == CourtCaseType.CRIMINAL:
-        #     jury_agent = agents_manager.get_jury_agent(partial(self.chat_view, 'jury'))
-        #     jury_tasks = tasks_manager.get_jury_tasks(jury_agent)
-        #     agents = [judge_agent, jury_agent, witness_agent, prosecution_agent, defense_agent]
-        #     tasks = [judge_tasks, jury_tasks, witness_tasks, prosecution_tasks, defense_tasks]
-        # else:
-        #     agents = [judge_agent, witness_agent, prosecution_agent, defense_agent]
-        #     tasks = [judge_tasks, witness_tasks, prosecution_tasks, defense_tasks]
+        if AppState.get_value('court_type') == CourtCaseType.CRIMINAL:
+            jury_agent = agents_factory.jury_agent()
+            jury_tasks = tasks_factory.get_jury_tasks(jury_agent, chat_view_wrapper('jury', self.jury_container))
+            agents = [judge_agent, jury_agent, witness_agent, prosecution_agent, defense_agent]
+            tasks = [*judge_tasks, *jury_tasks, *witness_tasks, *prosecution_tasks, *defense_tasks]
+        else:
+            agents = [judge_agent, witness_agent, prosecution_agent, defense_agent]
+            tasks = [*judge_tasks, *witness_tasks, *prosecution_tasks, *defense_tasks]
 
-        # court_crew = CourtCrew().get_crew(agents=agents, tasks=tasks)
-        court_crew = CourtCrew().get_crew(agents=[judge_agent], tasks=judge_tasks)
+        court_crew = CourtCrew().get_crew(agents=agents, tasks=tasks)
         court_crew.kickoff()
-        # print(len(AppState.get_value('judge_chat_message')))
-        # print(AppState.get_value('judge_chat_message'))
 
     def view(self) -> None:
         if AppState.get_value('ready_to_start_simulation') is None:
             self.invalid_settings_modal()
 
-        if (AppState.get_value('user_case_description') is None and
+        if (AppState.get_value('case_description') is None and
                 AppState.get_value('ready_to_start_simulation') is not None):
             self.case_description_modal()
 

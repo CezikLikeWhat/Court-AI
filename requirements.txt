@@ -35,6 +35,7 @@ deprecation==2.1.0
 distro==1.9.0
 docstring-parser==0.15
 docx2txt==0.8
+duckduckgo_search==6.1.0
 embedchain==0.1.102
 entrypoints==0.4
 Faker==25.0.1
@@ -151,6 +152,7 @@ pyparsing==3.1.2
 pypdf==3.17.4
 PyPika==0.48.9
 pyproject_hooks==1.1.0
+pyreqwest_impersonate==0.4.5
 pyright==1.1.362
 pysbd==0.3.4
 PySocks==1.7.1

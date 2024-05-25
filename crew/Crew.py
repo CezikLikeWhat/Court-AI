@@ -53,7 +53,7 @@ class CourtCrew:
         return Crew(
             agents=agents,
             tasks=tasks,
-            process=Process.sequential,
+            process=Process.hierarchical,
             verbose=2,
             share_crew=False,
             full_output=True,

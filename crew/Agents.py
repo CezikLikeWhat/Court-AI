@@ -1,5 +1,6 @@
 import os
 from abc import ABC, abstractmethod
+from textwrap import dedent
 from typing import List
 
 from crewai import Agent
@@ -17,14 +18,17 @@ from state.AppState import AppState
 class BaseAgent(ABC):
     llm: BaseChatModel = NotImplemented
     tools: List[BaseTool] = NotImplemented
+    case_description: str = NotImplemented
 
     @abstractmethod
     def __init__(self,
                  llm: BaseChatModel,
-                 tools: List[BaseTool]
+                 tools: List[BaseTool],
+                 case_description: str
                  ) -> None:
         self.llm = llm
         self.tools = tools
+        self.case_description = case_description
 
     @abstractmethod
     def create(self) -> Agent:
@@ -34,16 +38,24 @@ class BaseAgent(ABC):
 class JudgeAgent(BaseAgent):
     def __init__(self,
                  llm: BaseChatModel,
-                 tools: List[BaseTool]
+                 tools: List[BaseTool],
+                 case_description: str
                  ) -> None:
         self.llm = llm
         self.tools = tools
+        self.case_description = case_description
 
     def create(self) -> Agent:
         return Agent(
             role='A Judge in the supreme court',
-            goal='Conduct a court hearing and issue a final verdict based on the evidence presented by the prosecution and the witness defense',
-            backstory='As a top supreme court judge, you have honed your skills in law and have handled a huge number of court cases. Thanks to them, you are able to make a final judgment based on the evidence in the case',
+            goal='Conduct a court hearing and issue a final verdict based on the evidence presented by the prosecution and the defense.',
+            backstory=dedent(f'''
+            As a top supreme court judge, you have honed your skills in law and have handled numerous court cases.
+            Your extensive experience allows you to make fair and informed judgments based on the evidence and arguments presented.
+            
+            Case description:
+            {self.case_description}
+            '''),
             tools=self.tools,
             llm=self.llm,
             max_iter=1,
@@ -58,16 +70,24 @@ class JudgeAgent(BaseAgent):
 class WitnessAgent(BaseAgent):
     def __init__(self,
                  llm: BaseChatModel,
-                 tools: List[BaseTool]
+                 tools: List[BaseTool],
+                 case_description: str
                  ) -> None:
         self.llm = llm
         self.tools = tools
+        self.case_description = case_description
 
     def create(self) -> Agent:
         return Agent(
             role='Witness at court hearing',
-            goal='You were at the scene and based on your knowledge you are able to answer the questions asked by the prosecution and the defense of the accused',
-            backstory='',
+            goal='Provide truthful testimony based on personal knowledge and experience, answering questions posed by both the prosecution and the defense.',
+            backstory=dedent(f'''
+            You were at the scene of the incident and have firsthand knowledge of what transpired.
+            Your testimony is crucial in helping the court understand the facts of the case.
+            
+            Case description:
+            {self.case_description}
+            '''),
             tools=self.tools,
             llm=self.llm,
             max_iter=5,
@@ -82,16 +102,24 @@ class WitnessAgent(BaseAgent):
 class ProsecutionAgent(BaseAgent):
     def __init__(self,
                  llm: BaseChatModel,
-                 tools: List[BaseTool]
+                 tools: List[BaseTool],
+                 case_description: str
                  ) -> None:
         self.llm = llm
         self.tools = tools
+        self.case_description = case_description
 
     def create(self) -> Agent:
         return Agent(
             role='Prosecutor at court hearing',
-            goal='Present evidence and arguments that prove the guilt of the accused beyond a reasonable doubt',
-            backstory='As a seasoned prosecutor with a track record of high-profile cases, you are known for your meticulous preparation and compelling arguments. You firmly believe in the justice system and your role in ensuring that criminals are held accountable for their actions.',
+            goal='Present evidence and arguments that prove the guilt of the accused beyond a reasonable doubt.',
+            backstory=dedent(f'''
+            As a seasoned prosecutor with a track record of high-profile cases, you are known for your meticulous preparation and compelling arguments.
+            You believe in the justice system and your role in ensuring that criminals are held accountable for their actions.
+            
+            Case description:
+            {self.case_description}
+            '''),
             tools=self.tools,
             llm=self.llm,
             max_iter=5,
@@ -106,16 +134,24 @@ class ProsecutionAgent(BaseAgent):
 class DefenseAgent(BaseAgent):
     def __init__(self,
                  llm: BaseChatModel,
-                 tools: List[BaseTool]
+                 tools: List[BaseTool],
+                 case_description: str
                  ) -> None:
         self.llm = llm
         self.tools = tools
+        self.case_description = case_description
 
     def create(self) -> Agent:
         return Agent(
             role='Defense attorney at court hearing',
-            goal='Present evidence and arguments that create reasonable doubt about the guilt of the accused and ensure they receive a fair trial',
-            backstory='With years of experience in defending clients in criminal cases, you are known for your tenacity and skill in the courtroom. You are committed to protecting the rights of the accused and ensuring that the burden of proof lies with the prosecution.',
+            goal='Present evidence and arguments that create reasonable doubt about the guilt of the accused and ensure they receive a fair trial.',
+            backstory=dedent(f'''
+            With years of experience defending clients in criminal cases, you are known for your tenacity and skill in the courtroom.
+            You are committed to protecting the rights of the accused and ensuring that the burden of proof lies with the prosecution.
+            
+            Case description:
+            {self.case_description}
+            '''),
             tools=self.tools,
             llm=self.llm,
             max_iter=5,
@@ -130,16 +166,25 @@ class DefenseAgent(BaseAgent):
 class JuryAgent(BaseAgent):
     def __init__(self,
                  llm: BaseChatModel,
-                 tools: List[BaseTool]
+                 tools: List[BaseTool],
+                 case_description: str
                  ) -> None:
         self.llm = llm
         self.tools = tools
+        self.case_description = case_description
 
     def create(self) -> Agent:
         return Agent(
             role='Jury member at court hearing',
-            goal='Listen to the evidence presented by both the prosecution and the defense, deliberate with fellow jurors, and deliver a fair and impartial verdict based on the evidence',
-            backstory='You are part of a diverse group of citizens selected to serve as a juror in this case. Your background and experiences bring a unique perspective to the jury deliberation process. You understand the gravity of your duty and are committed to delivering a just verdict based on the evidence presented.',
+            goal='Listen to the evidence presented by both the prosecution and the defense, deliberate with fellow jurors, and deliver a fair and impartial verdict based on the evidence.',
+            backstory=dedent(f'''
+            You are part of a diverse group of citizens selected to serve as a juror in this case.
+            Your background and experiences bring a unique perspective to the jury deliberation process.
+            You understand the gravity of your duty and are committed to delivering a just verdict based on the evidence presented.
+            
+            Case description:
+            {self.case_description}
+            '''),
             tools=self.tools,
             llm=self.llm,
             max_iter=5,
@@ -155,7 +200,8 @@ class AgentsFactory:
     def judge_agent(self) -> Agent:
         agent = JudgeAgent(
             self._get_llm_by_choose(AgentPurpose.JUDGE),
-            []
+            [],
+            AppState.get_value('case_description')
         )
 
         return agent.create()
@@ -163,7 +209,8 @@ class AgentsFactory:
     def jury_agent(self) -> Agent:
         agent = JuryAgent(
             self._get_llm_by_choose(AgentPurpose.JURY),
-            []
+            [],
+            AppState.get_value('case_description')
         )
 
         return agent.create()
@@ -171,7 +218,8 @@ class AgentsFactory:
     def witness_agent(self) -> Agent:
         agent = WitnessAgent(
             self._get_llm_by_choose(AgentPurpose.WITNESS),
-            []
+            [],
+            AppState.get_value('case_description')
         )
 
         return agent.create()
@@ -179,7 +227,8 @@ class AgentsFactory:
     def prosecution_agent(self) -> Agent:
         agent = ProsecutionAgent(
             self._get_llm_by_choose(AgentPurpose.PROSECUTOR),
-            []
+            [],
+            AppState.get_value('case_description')
         )
 
         return agent.create()
@@ -187,7 +236,8 @@ class AgentsFactory:
     def defense_agent(self) -> Agent:
         agent = DefenseAgent(
             self._get_llm_by_choose(AgentPurpose.DEFENSE),
-            []
+            [],
+            AppState.get_value('case_description')
         )
 
         return agent.create()
